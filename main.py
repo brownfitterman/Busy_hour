@@ -123,7 +123,7 @@ def some_job():
    
     import os
 
-    linux_conn = pyodbc.connect('''DRIVER={FreeTDS};
+    linux_conn =('''DRIVER={FreeTDS};
                         SERVER=103.212.120.142;
                         PORT=1433;
                         DATABASE=scouter;

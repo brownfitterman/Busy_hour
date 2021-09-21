@@ -18,6 +18,7 @@ cnxn = pyodbc.connect(cnxn_str)
 cursor = cnxn.cursor()
 cursor.execute("select GooglePlaceName from Place where  BusyHoursSun != '0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0'")
 rows = cursor.fetchall()
+print(rows)
 
 search_url = "http://list.didsoft.com/get?email=rajeshkumardevapp@gmail.com&pass=zxamw8&pid=http1000&showcountry=no&level=1"
 
