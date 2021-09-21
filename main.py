@@ -143,7 +143,9 @@ def some_job():
         cnxn_str = window_cnxn_str
     else: 
         cnxn_str = linux_conn
+    print(cnxn_str)
     cnxn = pyodbc.connect(cnxn_str)
+    
     #print(cnxn)
     cursor = cnxn.cursor()
     cursor.execute("select GooglePlaceName from Place where  BusyHoursSun != '0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0'")
