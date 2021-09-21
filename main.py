@@ -12,13 +12,7 @@ import pyodbc
 
 import os
 
-linux_conn = pyodbc.connect('''DRIVER={FreeTDS};
-                      SERVER=103.212.120.142;
-                      PORT=1433;
-                      DATABASE=scouter;
-                      UID=krishna;
-                      PWD=Sa@123,.;
-                      TDS_VERSION=7.2''')
+linux_conn = ('DRIVER={FreeTDS};SERVER=103.212.120.142;PORT=1433;DATABASE=scouter;UID=krishna;PWD=Sa@123,.;TDS_VERSION=7.2')
 
 
 window_cnxn_str = ("Driver={SQL Server};"
@@ -28,11 +22,11 @@ window_cnxn_str = ("Driver={SQL Server};"
             "PWD=Sa@123,.")
 
 cnxn_str = ''
-if os.environ['OS'].lower().index("windows") > 0:
+if os.environ['OS'].lower().index("windows") >= 0:
     cnxn_str = window_cnxn_str
 else: 
     cnxn_str = linux_conn
-cnxn = pyodbc.connect(cnxn_str)
+print(cnxn_str)
 cnxn = pyodbc.connect(cnxn_str)
 #print(cnxn)
 cursor = cnxn.cursor()
@@ -131,7 +125,6 @@ def some_job():
                         PWD=Sa@123,.;
                         TDS_VERSION=7.2''')
 
-
     window_cnxn_str = ("Driver={SQL Server};"
                 "Server=103.212.120.142;"
                 "Database=scouter;"
@@ -139,7 +132,7 @@ def some_job():
                 "PWD=Sa@123,.")
 
     cnxn_str = ''
-    if os.environ['OS'].lower().index("windows") > 0:
+    if os.environ['OS'].lower().index("windows") >= 0:
         cnxn_str = window_cnxn_str
     else: 
         cnxn_str = linux_conn
