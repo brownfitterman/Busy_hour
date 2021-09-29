@@ -14,7 +14,7 @@ import os
 
 
 
-window_cnxn_str = ("Driver={SQL Server};"
+window_cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.0.so.1.1};"
             "Server=103.212.120.142;"
             "Database=scouter;"
             "UID=krishna;"
