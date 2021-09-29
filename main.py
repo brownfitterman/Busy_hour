@@ -14,7 +14,7 @@ import os
 
 
 
-window_cnxn_str = ("Driver={SQL Server};"
+window_cnxn_str = ("Driver={FreeTDS};"
             "Server=103.212.120.142;"
             "Database=scouter;"
             "UID=krishna;"
