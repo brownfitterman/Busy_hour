@@ -15,19 +15,19 @@ import os
 linux_conn = ('DRIVER={FreeTDS};SERVER=103.212.120.142;PORT=1433;DATABASE=scouter;UID=krishna;PWD=Sa@123,.;TDS_VERSION=7.2')
 
 
-window_cnxn_str = ("Driver={SQL Server};"
-            "Server=103.212.120.142;"
-            "Database=scouter;"
-            "UID=krishna;"
-            "PWD=Sa@123,.")
+# window_cnxn_str = ("Driver={SQL Server};"
+#             "Server=103.212.120.142;"
+#             "Database=scouter;"
+#             "UID=krishna;"
+#             "PWD=Sa@123,.")
 
-cnxn_str = ''
-if os.environ['OS'].lower().index("windows") >= 0:
-    cnxn_str = window_cnxn_str
-else: 
-    cnxn_str = linux_conn
-print(cnxn_str)
-cnxn = pyodbc.connect(cnxn_str)
+# cnxn_str = ''
+# if os.environ['OS'].lower().index("windows") >= 0:
+#     cnxn_str = window_cnxn_str
+# else: 
+#     cnxn_str = linux_conn
+print(linux_conn)
+cnxn = pyodbc.connect(linux_conn)
 #print(cnxn)
 cursor = cnxn.cursor()
 cursor.execute("select GooglePlaceName from Place where  BusyHoursSun != '0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0'")
@@ -125,19 +125,19 @@ def some_job():
                         PWD=Sa@123,.;
                         TDS_VERSION=7.2''')
 
-    window_cnxn_str = ("Driver={SQL Server};"
-                "Server=103.212.120.142;"
-                "Database=scouter;"
-                "UID=krishna;"
-                "PWD=Sa@123,.")
+    # window_cnxn_str = ("Driver={SQL Server};"
+    #             "Server=103.212.120.142;"
+    #             "Database=scouter;"
+    #             "UID=krishna;"
+    #             "PWD=Sa@123,.")
 
-    cnxn_str = ''
-    if os.environ['OS'].lower().index("windows") >= 0:
-        cnxn_str = window_cnxn_str
-    else: 
-        cnxn_str = linux_conn
-    print(cnxn_str)
-    cnxn = pyodbc.connect(cnxn_str)
+    # cnxn_str = ''
+    # if os.environ['OS'].lower().index("windows") >= 0:
+    #     cnxn_str = window_cnxn_str
+    # else: 
+    #     cnxn_str = linux_conn
+    print(linux_conn)
+    cnxn = pyodbc.connect(linux_conn)
     
     #print(cnxn)
     cursor = cnxn.cursor()
