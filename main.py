@@ -1,4 +1,4 @@
-
+from apscheduler.schedulers.blocking import BlockingScheduler
 
 import urllib.request
 import urllib.parse
@@ -12,7 +12,7 @@ import pyodbc
 
 import os
 
-linux_conn = ('DRIVER={FreeTDS};SERVER=103.212.120.142;PORT=1433;DATABASE=scouter;UID=krishna;PWD=Sa@123,.;TDS_VERSION=7.2')
+linux_conn = ('DRIVER={ODBC Driver 15 for SQL Server};SERVER=103.212.120.142;PORT=1433;DATABASE=scouter;UID=krishna;PWD=Sa@123,.;TDS_VERSION=7.2')
 
 
 # window_cnxn_str = ("Driver={SQL Server};"
@@ -117,7 +117,7 @@ def some_job():
    
     import os
 
-    linux_conn =('''DRIVER={FreeTDS};
+    linux_conn =('''DRIVER={ODBC Driver 15 for SQL Server};
                         SERVER=103.212.120.142;
                         PORT=1433;
                         DATABASE=scouter;
