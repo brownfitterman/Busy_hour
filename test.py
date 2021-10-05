@@ -80,7 +80,6 @@ def job():
             print(current_popularity, time.time())
             updateRecords.append({ 'googlePlaceName': url, 'currentpopularity': current_popularity })
         except Exception as e:
-            updateRecords.append({ 'googlePlaceName': url, 'currentpopularity': "N/A" })
             print("Unable to get url {} due to {}.".format(url, e.__class__))
         dj=dj+1
 
