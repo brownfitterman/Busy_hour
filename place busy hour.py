@@ -4,7 +4,7 @@ import time
 import ssl
 import logging
 import json
-import pandas
+import pandas as pd
 from concurrent.futures import ThreadPoolExecutor as PoolExecutor
 import pyodbc
 
@@ -18,8 +18,13 @@ cnxn = pyodbc.connect(cnxn_str)
 cursor = cnxn.cursor()
 cursor.execute("select GooglePlaceName from Place where  BusyHoursSun != '0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0'")
 rows = cursor.fetchall()
-print(rows)
 
+places_names=[]
+for item in rows:
+    item=str(item).replace("'","").replace("(","").replace(")","").replace(",","")
+    # print(item)
+    places_names.append(item)
+print(len(places_names))
 search_url = "http://list.didsoft.com/get?email=rajeshkumardevapp@gmail.com&pass=zxamw8&pid=http1000&showcountry=no&level=1"
 
 resp = urllib.request.urlopen(urllib.request.Request(url=search_url, data=None))
@@ -34,9 +39,12 @@ def index_get(array, *argv):
         return array
     except (IndexError, TypeError):
         return None
-    
+popularity_time=[]   
 updateRecords = []
-def get_it(url):
+def get_it(url,):
+    global i
+    print(f'no= {i}')
+    i=i+1
     try:
         
         USER_AGENT = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) "
@@ -75,25 +83,43 @@ def get_it(url):
         jdata = json.loads(jdata[4:])
         info = index_get(jdata, 0, 1, 0, 14)
         current_popularity = index_get(info, 84, 7, 1)
-        print(current_popularity, time.time())
+        popularity_time.append(current_popularity)
+        print(current_popularity)
         updateRecords.append({ 'GooglePlaceName': url.GooglePlaceName, 'currentpopularity': current_popularity })
+        # print(updateRecords)
     except Exception as e:
+        popularity_time.append("none")
         print("Unable to get url {} due to {}.".format(url, e.__class__))
 
 
 start = time.time()
 with PoolExecutor(max_workers=25) as executor:
+    i=1
     for _ in executor.map(get_it, rows):
+
+        
         pass
 end = time.time()
 print("Took {} seconds to pull websites.".format(end - start))
+# print(updateRecords)
+# start = time.time()
+# for record in updateRecords:
+#     print(record["GooglePlaceName"])
+#     cursor.execute("UPDATE Place SET currentpopularity=? WHERE GooglePlaceName=?", record["currentpopularity"], record["GooglePlaceName"])
+# end = time.time()
+# print("Took {} seconds to insert to DB.".format(end - start))
+df=[{
+    "places_names":places_names,
+    "popularity_time":popularity_time
+    }]
 
-start = time.time()
-for record in updateRecords:
-    print(record["GooglePlaceName"])
-    cursor.execute("UPDATE Place SET currentpopularity=? WHERE GooglePlaceName=?", record["currentpopularity"], record["GooglePlaceName"])
-end = time.time()
-print("Took {} seconds to insert to DB.".format(end - start))
+
+
+
+
+
+
+
 cursor.commit()
 #print(current_popularity, time.time())
 
