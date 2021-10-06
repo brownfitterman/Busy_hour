@@ -1,11 +1,12 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
 
-import urllib.request as re
+import urllib.request
 import urllib.parse
 import time
 import ssl
 import logging
 import json
+import requests as re
 import pandas
 from concurrent.futures import ThreadPoolExecutor as PoolExecutor
 import pyodbc
