@@ -8,6 +8,7 @@ data1=json.loads(data1)
 for i in data1:
     place_name=i["googlePlaceName"]
     googlePlaceName.append(place_name)
+    print(googlePlaceName)
     
 
     

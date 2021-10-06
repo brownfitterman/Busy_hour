@@ -39,6 +39,7 @@ def job():
     def get_it(url):
         global dj
         print(f'NO. = {dj}')
+        print(url)
         try:
             
             USER_AGENT = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) "
