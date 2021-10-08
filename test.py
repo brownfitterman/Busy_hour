@@ -6,21 +6,18 @@ import time
 import ssl
 import logging
 import json
-import pandas
 from concurrent.futures import ThreadPoolExecutor as PoolExecutor
-import pyodbc
+import random
+
 def job():
-    global dj
-    data=re.get("https://www.postman.com/collections/89680f8c550554cdcfb4")
+    data=re.post("http://nightlife.cubesservices.com/api/v1/Place/GetPlaceNames").json()
     googlePlaceName=[]
-    data1=(data.json())["item"][0]["request"]["body"]["raw"]
-    data1=json.loads(data1)
-    for i in data1:
+    for i in data["data"]:
         place_name=i["googlePlaceName"]
         googlePlaceName.append(place_name)
     rows = googlePlaceName
 
-    search_url = "http://list.didsoft.com/get?email=rajeshkumardevapp@gmail.com&pass=zxamw8&pid=http1000&showcountry=no&level=1"
+    search_url = "http://list.didsoft.com/get?email=rajeshkumardevapp@gmail.com&pass=zxamw8&pid=http1000&showcountry=no&level=3"
 
     resp = urllib.request.urlopen(urllib.request.Request(url=search_url, data=None))
     data = resp.read().decode('utf-8').split('/*""*/')[0]
@@ -37,9 +34,6 @@ def job():
         
     updateRecords = []
     def get_it(url):
-        global dj
-        print(f'NO. = {dj}')
-        print(url)
         try:
             
             USER_AGENT = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) "
@@ -65,9 +59,11 @@ def job():
             logging.info("searchterm: " + search_url)
             
             gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-            
-            resp = urllib.request.urlopen(urllib.request.Request(url=search_url, data=None, headers=USER_AGENT),
-                                        context=gcontext)
+            proxy_handler = urllib.request.ProxyHandler({'http': random.choice(urls)})
+            req = urllib.request.Request(url=search_url, data=None, headers=USER_AGENT)
+            opener = urllib.request.build_opener(proxy_handler)
+            resp = opener.open(req)
+            #resp = urllib.request.urlopen(req,context=gcontext)
             data = resp.read().decode('utf-8').split('/*""*/')[0]
             
             jend = data.rfind("}")
@@ -78,22 +74,30 @@ def job():
             jdata = json.loads(jdata[4:])
             info = index_get(jdata, 0, 1, 0, 14)
             current_popularity = index_get(info, 84, 7, 1)
+            if current_popularity == None:
+                current_popularity = 0
             print(current_popularity, time.time())
             updateRecords.append({ 'googlePlaceName': url, 'currentpopularity': current_popularity })
         except Exception as e:
             print("Unable to get url {} due to {}.".format(url, e.__class__))
-        dj=dj+1
 
 
     start = time.time()
-    with PoolExecutor(max_workers=25) as executor:
-        dj=0
+    with PoolExecutor(max_workers=20) as executor:
         for _ in executor.map(get_it, rows):
             pass
     end = time.time()
     print("Took {} seconds to pull websites.".format(end - start))
-
-    re.put("https://www.postman.com/collections/89680f8c550554cdcfb4",data=updateRecords)
+    insertnumber = 500
+    for n in range(int(len(updateRecords)/insertnumber)+1):
+        start = (n + 1) * insertnumber
+        print(len(updateRecords[n * insertnumber :start]))
+        headers = {'Content-Type': 'application/json',
+                   "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.1.2222.33 Safari/537.36",
+                   "Accept-Encoding": "*",
+                   "Connection": "keep-alive", "Accept": "*/*"}
+        response = re.post("http://nightlife.cubesservices.com/api/v1/Place/UpdateCurrentPopularity",json=updateRecords[n * insertnumber :start], headers=headers, timeout=20 *60)
+        print(response.json())
 
 job()
 scheduler = BlockingScheduler()
