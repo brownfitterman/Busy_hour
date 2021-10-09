@@ -1,6 +1,7 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
 import requests as re
 import urllib.request
+import schedule
 import urllib.parse
 import time
 import ssl
@@ -100,6 +101,9 @@ def job():
         print(response.json())
 
 job()
-scheduler = BlockingScheduler()
-scheduler.add_job(job, 'interval', hours=1)
-scheduler.start()
+# scheduler = BlockingScheduler()
+# scheduler.add_job(job, 'interval', hours=1)
+# scheduler.start()
+schedule.every(4).seconds.do(job)
+while 1:
+    schedule.run_pending()
