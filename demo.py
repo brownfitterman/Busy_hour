@@ -100,13 +100,17 @@ def job():
                    "Accept-Encoding": "*",
                    "Connection": "keep-alive", "Accept": "*/*"}
         response = re.post("http://nightlife.cubesservices.com/api/v1/Place/UpdateCurrentPopularity",json=updateRecords[n * insertnumber :start], headers=headers, timeout=20 *60)
-        print(response.json())
+        try:
+            print(response.json())
+        except:
+            pass
     print("Data  inserted to  df ")
 print("fhfhfhfhf")
-job()
+
 # scheduler = BlockingScheduler()
 # scheduler.add_job(job, 'interval', hours=1)
 # scheduler.start()
-schedule.every(4).seconds.do(job)
-while 1:
-    schedule.run_pending()
+
+while True:
+    job()
+    time.sleep(10)
