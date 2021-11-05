@@ -11,7 +11,7 @@ from concurrent.futures import ThreadPoolExecutor as PoolExecutor
 import random
 
 def job():
-    data={"cityId":"e775291e-9969-4374-8146-0f33b9f3c2dd,8db8ac4f-5286-47cb-889a-8f5cdd5e8f09"}
+    data={"cityId":"8db8ac4f-5286-47cb-889a-8f5cdd5e8f09"}
     data=re.post("http://nightlife.cubesservices.com/api/v1/Place/GetPlaceNames",json=data).json()
     googlePlaceName=[]
     for i in data["data"]:
@@ -110,7 +110,10 @@ print("fhfhfhfhf")
 # scheduler = BlockingScheduler()
 # scheduler.add_job(job, 'interval', hours=1)
 # scheduler.start()
-
+# job()
 while True:
-    job()
-    time.sleep(10)
+    try:
+        job()
+        time.sleep(180)
+    except:
+        pass
