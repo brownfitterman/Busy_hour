@@ -116,4 +116,5 @@ while True:
         job()
         time.sleep(180)
     except:
+        print("except")
         pass
