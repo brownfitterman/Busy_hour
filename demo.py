@@ -12,9 +12,11 @@ import random
 
 def job():
     data={"cityId":"8db8ac4f-5286-47cb-889a-8f5cdd5e8f09"}
-    data=re.post("http://nightlife.cubesservices.com/api/v1/Place/GetPlaceNames",json=data).json()
+
+    main=re.post("http://nightlife.cubesservices.com/api/v1/Place/GetPlaceNames",json=data).json()
+    
     googlePlaceName=[]
-    for i in data["data"]:
+    for i in main["data"]:
         place_name=i["googlePlaceName"]
         googlePlaceName.append(place_name)
     rows = googlePlaceName
@@ -46,7 +48,7 @@ def job():
             "tbm": "map",
             "tch": 1,
             "hl": "en",
-            "q": urllib.parse.quote_plus("Crazy Gringo Mexican Cantina"),
+            "q": urllib.parse.quote_plus(url),
             "pb": "!4m12!1m3!1d4005.9771522653964!2d-122.42072974863942!3d37.8077459796541!2m3!1f0!2f0!3f0!3m2!1i1125!2i976"
                 "!4f13.1!7i20!10b1!12m6!2m3!5m1!6e2!20e3!10b1!16b1!19m3!2m2!1i392!2i106!20m61!2m2!1i203!2i100!3m2!2i4!5b1"
                 "!6m6!1m2!1i86!2i86!1m2!1i408!2i200!7m46!1m3!1e1!2b0!3e3!1m3!1e2!2b1!3e2!1m3!1e2!2b0!3e3!1m3!1e3!2b0!3e3!"
