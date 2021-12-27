@@ -83,13 +83,16 @@ def job():
                 current_popularity = 0
             print(current_popularity, time.time())
             updateRecords.append({ 'googlePlaceName': url, 'currentpopularity': current_popularity })
+            
         except Exception as e:
             print("Unable to get url {} due to {}.".format(url, e.__class__))
+        
 
 
     start = time.time()
     with PoolExecutor(max_workers=20) as executor:
         for _ in executor.map(get_it, rows):
+            print(updateRecords)
             pass
     end = time.time()
     print("Took {} seconds to pull websites.".format(end - start))

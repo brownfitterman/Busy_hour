@@ -11,12 +11,16 @@ from concurrent.futures import ThreadPoolExecutor as PoolExecutor
 import random
 
 def job():
-    data=re.post("http://nightlife.cubesservices.com/api/v1/Place/GetPlaceNames").json()
+    data={"cityId":"85ab5e34-3d98-406f-a8c1-77df8ed68c2c"}
+
+    main=re.post("http://nightlife.cubesservices.com/api/v1/Place/GetPlaceNames",json=data).json()
+    
     googlePlaceName=[]
-    for i in data["data"]:
+    for i in main["data"]:
         place_name=i["googlePlaceName"]
         googlePlaceName.append(place_name)
     rows = googlePlaceName
+    print(len(rows))
 
     search_url = "http://list.didsoft.com/get?email=rajeshkumardevapp@gmail.com&pass=zxamw8&pid=http1000&showcountry=no&level=3"
 
@@ -79,13 +83,16 @@ def job():
                 current_popularity = 0
             print(current_popularity, time.time())
             updateRecords.append({ 'googlePlaceName': url, 'currentpopularity': current_popularity })
+            
         except Exception as e:
             print("Unable to get url {} due to {}.".format(url, e.__class__))
+        
 
 
     start = time.time()
     with PoolExecutor(max_workers=20) as executor:
         for _ in executor.map(get_it, rows):
+            # print(updateRecords)
             pass
     end = time.time()
     print("Took {} seconds to pull websites.".format(end - start))
@@ -98,13 +105,21 @@ def job():
                    "Accept-Encoding": "*",
                    "Connection": "keep-alive", "Accept": "*/*"}
         response = re.post("http://nightlife.cubesservices.com/api/v1/Place/UpdateCurrentPopularity",json=updateRecords[n * insertnumber :start], headers=headers, timeout=20 *60)
-        print(response.json())
+        try:
+            print(response.json())
+        except:
+            pass
     print("Data  inserted to  df ")
-print("fhfhfhfhf")
-job()
+# print("fhfhfhfhf")
+
 # scheduler = BlockingScheduler()
 # scheduler.add_job(job, 'interval', hours=1)
 # scheduler.start()
-schedule.every(4).seconds.do(job)
-while 1:
-    schedule.run_pending()
+# job()
+while True:
+    try:
+        job()
+        time.sleep(180)
+    except:
+        print("except")
+        pass
