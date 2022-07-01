@@ -1,7 +1,6 @@
-from apscheduler.schedulers.blocking import BlockingScheduler
+from __future__ import print_function
 import requests as re
 import urllib.request
-import schedule
 import urllib.parse
 import time
 import ssl
@@ -9,18 +8,42 @@ import logging
 import json
 from concurrent.futures import ThreadPoolExecutor as PoolExecutor
 import random
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+
+
+# If modifying these scopes, delete the file token.json.
+SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+
+# The ID and range of a sample spreadsheet.
+SAMPLE_SPREADSHEET_ID = '1JIsKGiboIPb48RFclyOvQqXMUnnLNhll1s6nhyNzRYY'
+SAMPLE_RANGE_NAME = 'Attractions!A2:A'
+SERVICE_ACCOUNT_FILE='keys.json'
+creds = None
+creds=service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE,scopes=SCOPES)
+service = build('sheets', 'v4', credentials=creds)
+# Call the Sheets API
+sheet = service.spreadsheets()
+result = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID,
+                            range=SAMPLE_RANGE_NAME).execute()
+print(result)
+values = result.get('values', [])
+print(len(values))
+values=str(values).replace("[[","[").replace("]]","]").replace("], [",",").replace("['","").replace("','",",").replace("']","").split(",")
+print((values))
 
 def job():
-    data={"cityId":"85ab5e34-3d98-406f-a8c1-77df8ed68c2c"}
-
-    main=re.post("http://nightlife.cubesservices.com/api/v1/Place/GetPlaceNames",json=data).json()
-    
-    googlePlaceName=[]
-    for i in main["data"]:
-        place_name=i["googlePlaceName"]
-        googlePlaceName.append(place_name)
-    rows = googlePlaceName
-    print(len(rows))
+    creds=service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE,scopes=SCOPES)
+    service = build('sheets', 'v4', credentials=creds)
+    # Call the Sheets API
+    sheet = service.spreadsheets()
+    result = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID,
+                                range=SAMPLE_RANGE_NAME).execute()
+    values = result.get('values', [])
+    print(values)
+    values=str(values).replace("[[","[").replace("]]","]").replace("], [",",").replace("['","").replace("','",",").replace("']","").split(",")
+    print((values))
+    rows=values
 
     search_url = "http://list.didsoft.com/get?email=rajeshkumardevapp@gmail.com&pass=zxamw8&pid=http1000&showcountry=no&level=3"
 
@@ -37,7 +60,7 @@ def job():
         except (IndexError, TypeError):
             return None
         
-    updateRecords = []
+  
     def get_it(url):
         try:
             
@@ -63,56 +86,53 @@ def job():
             search_url = "https://www.google.de/search?" + "&".join(k + "=" + str(v) for k, v in params_url.items())
             logging.info("searchterm: " + search_url)
             
-            gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
             proxy_handler = urllib.request.ProxyHandler({'http': random.choice(urls)})
             req = urllib.request.Request(url=search_url, data=None, headers=USER_AGENT)
             opener = urllib.request.build_opener(proxy_handler)
             resp = opener.open(req)
-            data = resp.read().decode('utf-8').split('/*""*/')[0]
             
+            data = resp.read().decode('utf-8').split('/*""*/')[0]
+            # print(data)
+           
             jend = data.rfind("}")
+            # print(jend)
             if jend >= 0:
                 data = data[:jend + 1]
             
             jdata = json.loads(data)["d"]
+
             jdata = json.loads(jdata[4:])
+            
             info = index_get(jdata, 0, 1, 0, 14)
             current_popularity = index_get(info, 84, 7, 1)
             if current_popularity == None:
                 current_popularity = 0
             print(current_popularity, time.time())
-            updateRecords.append({ 'googlePlaceName': url, 'currentpopularity': current_popularity })
+            current_popularitys.append([current_popularity])
+            # updateRecords.append({ 'googlePlaceName': url, 'currentpopularity': current_popularity })
             
         except Exception as e:
             print("Unable to get url {} due to {}.".format(url, e.__class__))
-        
+            current_popularitys(["N/A"])
 
 
     start = time.time()
+    current_popularitys=[]
     with PoolExecutor(max_workers=20) as executor:
         for _ in executor.map(get_it, rows):
             pass
     end = time.time()
+    print(current_popularitys)
     print("Took {} seconds to pull websites.".format(end - start))
-    insertnumber = 500
-    for n in range(int(len(updateRecords)/insertnumber)+1):
-        start = (n + 1) * insertnumber
-        print(len(updateRecords[n * insertnumber :start]))
-        headers = {'Content-Type': 'application/json',
-                   "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.1.2222.33 Safari/537.36",
-                   "Accept-Encoding": "*",
-                   "Connection": "keep-alive", "Accept": "*/*"}
-        response = re.post("http://nightlife.cubesservices.com/api/v1/Place/UpdateCurrentPopularity",json=updateRecords[n * insertnumber :start], headers=headers, timeout=20 *60)
-        try:
-            print(response.json())
-        except:
-            pass
-    print("Data  inserted to  df ")
+    update=sheet.values().update(spreadsheetId=SAMPLE_SPREADSHEET_ID,
+                                range='Attractions!d2',valueInputOption="USER_ENTERED",body={"values":current_popularitys}).execute()
 
 while True:
     try:
         job()
         time.sleep(180)
-    except:
+    except Exception as err:
+        print(err)
+        break
         print("except")
         pass
