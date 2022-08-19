@@ -9,14 +9,24 @@ import logging
 import json
 from concurrent.futures import ThreadPoolExecutor as PoolExecutor
 import random
-
+BASE_URL="http://scouterlive.us-east-1.elasticbeanstalk.com"
+total_names=[]
 def job():
-    data={"cityId":"85ab5e34-3d98-406f-a8c1-77df8ed68c2c"}
-    main=re.post("http://scouterlive.us-east-1.elasticbeanstalk.com/api/v1/Place/GetPlaceNames",json=data).json()
+    data={
+        "filterInfo": [
+            {
+            "filterTerm": "35f85795-c119-4e37-9a24-ec8018810616",
+            "filterType": "EQUALS",
+            "filterBy": "cityId"
+            }
+        ]
+        }
+    main=re.post(f"{BASE_URL}/api/v1/Place/List",json=data).json()
     googlePlaceName=[]
     for i in main["data"]:
-        # print(i)
         place_name=i["GooglePlaceName"]
+        # place_name="Pizzeria 7 Bello 60329 Frankfurt am Main, Germany"
+        total_names.append(place_name)
         googlePlaceName.append(place_name)
     rows = googlePlaceName
     print(len(rows))
@@ -71,8 +81,7 @@ def job():
             
             jend = data.rfind("}")
             if jend >= 0:
-                data = data[:jend + 1]
-            
+                data = data[:jend + 1]   
             jdata = json.loads(data)["d"]
             jdata = json.loads(jdata[4:])
             info = index_get(jdata, 0, 1, 0, 14)
@@ -81,7 +90,6 @@ def job():
                 current_popularity = 0
             print(current_popularity, time.time())
             updateRecords.append({ 'googlePlaceName': url, 'currentpopularity': current_popularity })
-            
         except Exception as e:
             print("Unable to get url {} due to {}.".format(url, e.__class__))
         
@@ -101,7 +109,7 @@ def job():
                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.1.2222.33 Safari/537.36",
                    "Accept-Encoding": "*",
                    "Connection": "keep-alive", "Accept": "*/*"}
-        response = re.post("http://nightlife.cubesservices.com/api/v1/Place/UpdateCurrentPopularity",json=updateRecords[n * insertnumber :start], headers=headers, timeout=20 *60)
+        response = re.post(F"{BASE_URL}/api/v1/Place/UpdateCurrentPopularity",json=updateRecords[n * insertnumber :start], headers=headers, timeout=20 *60)
         try:
             print(response.json())
         except:
