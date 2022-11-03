@@ -1,7 +1,6 @@
 
 import requests as re
 import urllib.request
-
 import urllib.parse
 import time
 import ssl
@@ -12,7 +11,7 @@ import random
 
 def job():
     data={"cityId":"85ab5e34-3d98-406f-a8c1-77df8ed68c2c"}
-    main=re.post("http://scouterlive.ap-south-1.elasticbeanstalk.com/api/v1/Place/GetPlaceNames",json=data).json()
+    main=re.post("https://scouterdatamigrations.azurewebsites.net/api/v1/Place/GetPlaceNames",json=data).json()
     googlePlaceName=[]
     for i in main["data"]:
         # print(i)
